@@ -119,16 +119,8 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     }
   })
 
-  // ── Notify admin room via Socket.IO ──
-  const io = req.app.get('io')
-  if (io) {
-    io.to('admin').emit('newOrder', {
-      _id:         order._id,
-      orderNumber: order.orderNumber,
-      total,
-      status:      'received',
-    })
-  }
+  // Socket.IO notifications disabled on Vercel serverless
+  // Use polling (React Query refetchInterval) on admin dashboard instead
 
   sendSuccess(res, order, 201)
 })
@@ -214,19 +206,8 @@ exports.updateStatus = catchAsync(async (req, res, next) => {
   order.statusHistory.push({ status, updatedAt: new Date(), updatedBy: req.user._id })
   await order.save()
 
-  // ── Real-time notification to customer + admin via Socket.IO ──
-  const io = req.app.get('io')
-  if (io) {
-    io.to(`order:${order._id}`).emit('orderStatusUpdate', {
-      orderId:     order._id,
-      orderNumber: order.orderNumber,
-      status,
-    })
-    io.to('admin').emit('orderStatusUpdate', {
-      orderId: order._id,
-      status,
-    })
-  }
+  // Socket.IO notifications disabled on Vercel serverless
+  // Email notifications (sendOrderStatusUpdate) are sent below instead
 
   // ── Send status update email to customer (non-blocking) ──
   getClerkUserInfo(order.customer).then(({ email, name }) => {
