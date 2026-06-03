@@ -71,7 +71,7 @@ const orderSchema = new mongoose.Schema({
 // Indexes
 orderSchema.index({ customer: 1, createdAt: -1 })
 orderSchema.index({ status: 1, createdAt: -1 })
-orderSchema.index({ orderNumber: 1 })
+// orderSchema.index({ orderNumber: 1 })
 
 // Auto-generate order number: PH-YYYYMMDD-NNNN
 orderSchema.pre('save', async function (next) {
