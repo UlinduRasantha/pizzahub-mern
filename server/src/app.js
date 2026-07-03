@@ -1,22 +1,17 @@
-const express        = require('express')
-const helmet         = require('helmet')
-const cors           = require('cors')
-const morgan         = require('morgan')
-const cookieParser   = require('cookie-parser')
-const compression    = require('compression')
-const mongoSanitize  = require('express-mongo-sanitize')
-const rateLimit      = require('express-rate-limit')
+const express = require('express')
+const helmet = require('helmet')
+const cors = require('cors')
+const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
+const compression = require('compression')
+const mongoSanitize = require('express-mongo-sanitize')
+const rateLimit = require('express-rate-limit')
 const { clerkMiddleware } = require('@clerk/express')
-const errorHandler   = require('./middleware/errorHandler')
-const { AppError }   = require('./utils/appError')
-const logger         = require('./utils/logger')
+const errorHandler = require('./middleware/errorHandler')
+const { AppError } = require('./utils/appError')
+const logger = require('./utils/logger')
 
 const app = express()
-
-// ─── Trust proxy (required for Vercel / reverse proxies) ──────────────────────
-// Allows Express to correctly read the real client IP from X-Forwarded-For
-// which is needed for express-rate-limit to work properly on Vercel
-app.set('trust proxy', 1)
 
 // ─── Security headers ─────────────────────────────────────────────────────────
 app.use(helmet())
@@ -36,7 +31,7 @@ app.use(cors({
     cb(new Error(`CORS: origin ${origin} not allowed`))
   },
   credentials: true,
-  methods:     ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.options('*', cors())
@@ -85,16 +80,16 @@ app.use('/api', rateLimit({
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({
-  status:    'ok',
-  uptime:    process.uptime(),
+  status: 'ok',
+  uptime: process.uptime(),
   timestamp: new Date().toISOString(),
-  env:       process.env.NODE_ENV,
+  env: process.env.NODE_ENV,
 }))
 
 // ─── API routes ───────────────────────────────────────────────────────────────
-app.use('/api/v1/pizzas',  require('./routes/pizzaRoutes'))
-app.use('/api/v1/orders',  require('./routes/orderRoutes'))
-app.use('/api/v1/users',   require('./routes/userRoutes'))
+app.use('/api/v1/pizzas', require('./routes/pizzaRoutes'))
+app.use('/api/v1/orders', require('./routes/orderRoutes'))
+app.use('/api/v1/users', require('./routes/userRoutes'))
 app.use('/api/v1/profile', require('./routes/profileRoutes'))
 
 // ─── 404 handler ─────────────────────────────────────────────────────────────
