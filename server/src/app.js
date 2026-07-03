@@ -13,6 +13,11 @@ const logger         = require('./utils/logger')
 
 const app = express()
 
+// ─── Trust proxy (required for Vercel / reverse proxies) ──────────────────────
+// Allows Express to correctly read the real client IP from X-Forwarded-For
+// which is needed for express-rate-limit to work properly on Vercel
+app.set('trust proxy', 1)
+
 // ─── Security headers ─────────────────────────────────────────────────────────
 app.use(helmet())
 
